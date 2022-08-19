@@ -1,6 +1,6 @@
-# 🏈 NevcoCustomScoreboard
+# 🏈 ScorbitzCustomScoreboard
 
-Custom Scoreboard Overlay for [Nevco](https://nevco.com/) Scoreboards using a [Scorebitz](http://scorbitz.com/) Gateway on a local network. Built with NuxtJS & TailwindCSS. Intended for use as a streaming overlay on OBS/StreamLabs.
+Custom Scoreboard Overlay for [Nevco](https://nevco.com/) Scoreboards using a [Scorbitz](http://scorbitz.com/) Gateway on a local network. Built with NuxtJS & TailwindCSS. Intended for use as a streaming overlay on OBS/StreamLabs.
 
 ## Setup
 
