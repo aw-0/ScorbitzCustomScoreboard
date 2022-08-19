@@ -1,6 +1,6 @@
-# Nuxt 3 Minimal Starter
+# 🏈 NevcoCustomScoreboard
 
-Look at the [nuxt 3 documentation](https://v3.nuxtjs.org) to learn more.
+Custom Scoreboard Overlay for [Nevco](https://nevco.com/) Scoreboards using a [Scorebitz](http://scorbitz.com/) Gateway. Intended for use as a streaming overlay on OBS/StreamLabs.
 
 ## Setup
 
