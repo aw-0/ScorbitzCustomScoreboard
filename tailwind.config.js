@@ -1,7 +1,7 @@
 module.exports = {
 	theme: {
 		fontFamily: {
-			sans: ["Xball"],
+			sans: ["Goodland"],
 		},
 	},
 };
