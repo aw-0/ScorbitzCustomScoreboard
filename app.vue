@@ -1,50 +1,40 @@
 <template>
-	<div class="mr-14 flex h-screen flex-col items-center justify-center bg-[#FF00FF]" >
+	<div class="flex items-center justify-center font-black" >
 		<div class="flex rounded-lg">
-			<div class="flex py-2 rounded-lg border-b-8" :style="`background-color: ${config.guestMainHex}; border-color: ${config.guestSecondaryHex}`">
-				<div class="my-auto ml-2 block">
-					<div class="mb-1 rounded-sm px-0.5" :style="`background-color: ${config.guestSecondaryHex};`">
-						&nbsp;
-					</div>
-					<div class="mb-1 rounded-sm px-0.5" :style="`background-color: ${config.guestSecondaryHex};`">
-						&nbsp;
-					</div>
-					<div class="rounded-sm px-0.5" :style="`background-color: ${config.guestSecondaryHex};`">
-						&nbsp;
-					</div>
+			<div class="ml-4 flex py-2 border-b-8 rounded-lg text-white" :style="`background-color: ${config.guestMainHex}; border-color: ${config.guestSecondaryHex}`">
+				<div class="my-auto ml-2 mt-1 block">
+					<div v-for="n in guest.timeouts" class="mb-1 rounded-sm px-0.5" :style="`background-color: ${config.guestSecondaryHex}`">&nbsp;</div>
 				</div>
-				<div class="my-auto flex px-8">
-					<img :src="config.guestImgSource" class="my-auto h-14 w-12" />
-					<div class="my-auto ml-10 flex text-white">
-						<i class="fa-solid fa-circle my-auto mr-2 text-sm" :style="`color: ${config.guestSecondaryHex}`"></i>
-						<h1 class="mb-2 text-6xl font-black" :style="`color: ${config.guestText}`">
-							00
-						</h1>
+				<div class="flex px-8">
+					<img :src="config.guestImgSource" class="my-auto h-16 w-14" />
+					<div class="my-auto ml-10 flex">
+						<i class="fa-solid fa-circle my-auto mr-2 text-sm" :style="`color: ${possession === 'guest' ? config.guestSecondaryHex : config.guestMainHex}`"></i>
+						<h1 class="mb-1 text-6xl font-extrabold">{{guest.score}}</h1>
 					</div>
 				</div>
 			</div>
+			
 			<div class="ml-4 flex py-2 border-b-8 rounded-lg text-white" :style="`background-color: ${config.homeMainHex}; border-color: ${config.homeSecondaryHex}`">
 				<div class="flex px-8">
 					<img :src="config.homeImgSource" class="my-auto h-16 w-12" />
 					<div class="my-auto ml-10 flex">
-						<i class="fa-solid fa-circle my-auto mr-2 text-sm text-[#DFAB31]"></i>
-						<h1 class="mb-2 text-6xl font-black">00</h1>
+						<i class="fa-solid fa-circle my-auto mr-2 text-sm" :style="`color: ${possession === 'home' ? config.homeSecondaryHex : config.homeMainHex}`"></i>
+						<h1 class="mb-1 text-6xl font-extrabold">{{home.score}}</h1>
 					</div>
 				</div>
-				<div class="my-auto mr-2 block">
-					<div class="mb-1 rounded-sm bg-[#DFAB31] px-0.5">&nbsp;</div>
-					<div class="mb-1 rounded-sm bg-[#DFAB31] px-0.5">&nbsp;</div>
-					<div class="rounded-sm bg-[#DFAB31] px-0.5">&nbsp;</div>
+				<div class="my-auto mr-2 mt-1 block">
+					<div v-for="n in home.timeouts" class="mb-1 rounded-sm px-0.5" :style="`background-color: ${config.homeSecondaryHex}`">&nbsp;</div>
 				</div>
 			</div>
-			<div class="ml-4 rounded-lg flex bg-stone-700 px-8 py-2 py-auto text-white border-b-8 border-white">
-				<h1 class="mt-3 mb-1 text-5xl font-black">Q1</h1>
+
+			<div class="ml-4 rounded-lg flex bg-stone-700 px-8 py-6 my-auto text-white border-b-8 border-white">
+				<h1 class="text-5xl font-extrabold">Q{{quarter}}</h1>
 				<div class="ml-5 mr-5 rounded-sm bg-white px-0.5"></div>
-				<h1 class="mt-3 mb-1 text-5xl font-black">5:56</h1>
-        <div class="ml-5 mr-5 rounded-sm bg-white px-0.5"></div>
-        <div class="my-auto">
-          <h1 class="text-center text-5xl font-black mb-2">1st & 10</h1>
-        </div>
+				<h1 class="text-5xl font-extrabold">{{formatTimeLeft}}</h1>
+				<div class="ml-5 mr-5 rounded-sm bg-white px-0.5"></div>
+				<div class="my-auto">
+					<h1 class="text-center text-5xl font-extrabold mb-2">{{formatDown}} & {{toGo}}</h1>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -52,4 +42,78 @@
 
 <script setup>
 import * as config from "./config.json";
+
+const home = {
+	score: 0,
+	timeouts: 3
+}
+const guest = reactive({
+	score: 0,
+	timeouts: 3
+})
+const possession = ref("guest")
+const quarter = ref(1)
+const timeLeft = ref(750)
+const down = ref(1)
+const toGo = ref(10)
+
+const formatTimeLeft = computed(() => {
+	const minutes = Math.floor(timeLeft.value / 60);
+	let seconds = timeLeft.value % 60;
+
+	if (seconds < 10) {
+		seconds = `0${seconds}`;
+	}
+	return `${minutes}:${seconds}`;
+})
+
+const formatDown = computed(() => {
+	switch (down.value) {
+		case 1:
+			return "1st";
+		case 2:
+			return "2nd";
+		case 3:
+			return "3rd";
+		case 4:
+			return "4th";
+	}
+})
+
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+onMounted(async () => {
+	while (true) {
+		console.log("hi")
+		await sleep(1000)
+		timeLeft.value -= 1
+		if (quarter.value === 4) {
+			quarter.value = 1
+		} else {
+			quarter.value += 1
+		}
+		if (down.value === 4) {
+			down.value = 1
+		} else {
+			down.value += 1
+		}
+		if (possession.value === "home") {
+			possession.value = "guest"
+		} else {
+			possession.value = "home"
+		}
+		if (guest.timeouts === 0) {
+			guest.timeouts = 3
+		} else {
+			guest.timeouts -= 1
+		}
+		if (home.timeouts === 0) {
+			home.timeouts = 3
+		} else {
+			home.timeouts -= 1
+		}
+	}
+})
 </script>
