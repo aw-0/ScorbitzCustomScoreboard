@@ -43,10 +43,10 @@
 <script setup>
 import * as config from "./config.json";
 
-const home = {
+const home = reactive({
 	score: 0,
 	timeouts: 3
-}
+})
 const guest = reactive({
 	score: 0,
 	timeouts: 3
