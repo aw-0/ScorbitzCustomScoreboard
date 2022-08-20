@@ -1,0 +1,12 @@
+{
+	"scorbitzUrl": "192.168.128.211",
+	"mode": "football",
+	"guestImgSource": "/logos/lhs.png",
+	"guestMainHex": "#FFC323",
+	"guestSecondaryHex": "#1F3E7D",
+	"guestText": "white",
+	"homeImgSource": "/logos/patriot.png",
+	"homeMainHex": "#1F5D39",
+	"homeSecondaryHex": "#DFAB31",
+	"homeText": "white"
+}
