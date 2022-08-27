@@ -1,5 +1,5 @@
 <template>
-	<div class="flex items-center justify-center font-black" >
+	<div class="flex items-center justify-center font-black h-screen flex-col bg-[#FF00FF]" >
 		<div class="flex rounded-lg">
 			<div class="ml-4 flex py-2 border-b-8 rounded-lg text-white" :style="`background-color: ${config.guestMainHex}; border-color: ${config.guestSecondaryHex}`">
 				<div class="my-auto ml-2 mt-1 block">
@@ -89,6 +89,7 @@ onMounted(async () => {
 		console.log("hi")
 		await sleep(1000)
 		timeLeft.value -= 1
+		home.score += 1
 		if (quarter.value === 4) {
 			quarter.value = 1
 		} else {
