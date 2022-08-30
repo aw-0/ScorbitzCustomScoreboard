@@ -2,8 +2,11 @@
 	"enabled": true,
 	"scorbitzUrl": "http://localhost:3000/api/getdata?sport=football",
 	"mode": "football",
+	"guestImgSource": "/logos/...",
+	"guestMainHex": "#FFFFFF",
+	"guestSecondaryHex": "#000000",
 	"guestText": "white",
-	"homeImgSource": "/logos/patriot.png",
+	"homeImgSource": "/logos/...",
 	"homeMainHex": "#1F5D39",
 	"homeSecondaryHex": "#DFAB31",
 	"homeText": "white"
