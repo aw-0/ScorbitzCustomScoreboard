@@ -1,5 +1,5 @@
 {
-	"scorbitzUrl": "192.168.128.211",
+	"scorbitzUrl": "http://localhost:3000/api/getdata?sport=football",
 	"mode": "football",
 	"guestImgSource": "/logos/lhs.png",
 	"guestMainHex": "#FFC323",

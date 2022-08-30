@@ -41,21 +41,21 @@
 </template>
 
 <script setup>
-import * as config from "./config.json";
+import * as config from "../config.json";
 
 const home = reactive({
-	score: 0,
-	timeouts: 3
+	score: "0",
+	timeouts: "3"
 })
 const guest = reactive({
-	score: 0,
-	timeouts: 3
+	score: "0",
+	timeouts: "3"
 })
 const possession = ref("guest")
-const quarter = ref(1)
-const timeLeft = ref(750)
-const down = ref(1)
-const toGo = ref(10)
+const quarter = ref("1")
+const timeLeft = ref("750")
+const down = ref("1")
+const toGo = ref("10")
 
 const formatTimeLeft = computed(() => {
 	const minutes = Math.floor(timeLeft.value / 60);
@@ -69,13 +69,13 @@ const formatTimeLeft = computed(() => {
 
 const formatDown = computed(() => {
 	switch (down.value) {
-		case 1:
+		case "1":
 			return "1st";
-		case 2:
+		case "2":
 			return "2nd";
-		case 3:
+		case "3":
 			return "3rd";
-		case 4:
+		case "4":
 			return "4th";
 	}
 })
@@ -84,37 +84,23 @@ const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
+const subscribeToScoreboard = async () => {
+    const scoreboard = await $fetch(config.scorbitzUrl);
+    console.log(scoreboard);
+    down.value = scoreboard.down
+    toGo.value = scoreboard.yards_to_go
+    timeLeft.value = scoreboard.seconds
+    // TODO: Quarter
+    possession.value = scoreboard.possession
+    home.score = scoreboard.home_score
+    guest.score = scoreboard.guest_score
+    home.timeouts = scoreboard.home_tol
+    guest.timeouts = scoreboard.guest_tol
+    await sleep(150);
+    subscribeToScoreboard();
+}
+
 onMounted(async () => {
-	while (true) {
-		console.log("hi")
-		await sleep(1000)
-		timeLeft.value -= 1
-		home.score += 1
-		if (quarter.value === 4) {
-			quarter.value = 1
-		} else {
-			quarter.value += 1
-		}
-		if (down.value === 4) {
-			down.value = 1
-		} else {
-			down.value += 1
-		}
-		if (possession.value === "home") {
-			possession.value = "guest"
-		} else {
-			possession.value = "home"
-		}
-		if (guest.timeouts === 0) {
-			guest.timeouts = 3
-		} else {
-			guest.timeouts -= 1
-		}
-		if (home.timeouts === 0) {
-			home.timeouts = 3
-		} else {
-			home.timeouts -= 1
-		}
-	}
+	await subscribeToScoreboard();
 })
 </script>
