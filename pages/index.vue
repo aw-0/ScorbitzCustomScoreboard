@@ -101,6 +101,6 @@ const subscribeToScoreboard = async () => {
 }
 
 onMounted(async () => {
-	await subscribeToScoreboard();
+    if (config.enabled) await subscribeToScoreboard();
 })
 </script>

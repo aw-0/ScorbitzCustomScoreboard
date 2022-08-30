@@ -18,7 +18,7 @@ export default defineEventHandler((event) => {
         tenths: randomInteger(1,10),
         time_direction: '',
         time_flag: '',
-        yards_to_go: randomInteger(1,99),
+        yards_to_go: randomInteger(1,10),
     }
 })
 
