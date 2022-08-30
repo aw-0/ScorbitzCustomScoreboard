@@ -94,8 +94,8 @@ const subscribeToScoreboard = async () => {
     possession.value = scoreboard.possession
     home.score = scoreboard.home_score
     guest.score = scoreboard.guest_score
-    home.timeouts = scoreboard.home_tol
-    guest.timeouts = scoreboard.guest_tol
+    home.timeouts = Number(scoreboard.home_tol)
+    guest.timeouts = Number(scoreboard.guest_tol)
     await sleep(150);
     subscribeToScoreboard();
 }
