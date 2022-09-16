@@ -6,10 +6,10 @@
 					<div v-for="n in guest.timeouts" class="mb-1 rounded-sm px-0.5" :style="`background-color: ${config.guestSecondaryHex}`">&nbsp;</div>
 				</div>
 				<div class="flex px-8">
-					<img :src="config.guestImgSource" class="my-auto h-16 w-14" />
+					<img :src="config.guestImgSource" class="my-auto h-20 w-20" />
 					<div class="my-auto ml-10 flex">
 						<i class="fa-solid fa-circle my-auto mr-2 text-sm" :style="`color: ${possession === 'guest' ? config.guestSecondaryHex : config.guestMainHex}`"></i>
-						<h1 class="mb-1 text-6xl font-extrabold">{{guest.score}}</h1>
+						<h1 class="mt-1 text-6xl font-extrabold">{{guest.score}}</h1>
 					</div>
 				</div>
 			</div>
@@ -19,7 +19,7 @@
 					<img :src="config.homeImgSource" class="my-auto h-16 w-12" />
 					<div class="my-auto ml-10 flex">
 						<i class="fa-solid fa-circle my-auto mr-2 text-sm" :style="`color: ${possession === 'home' ? config.homeSecondaryHex : config.homeMainHex}`"></i>
-						<h1 class="mb-1 text-6xl font-extrabold">{{home.score}}</h1>
+						<h1 class="mt-1 text-6xl font-extrabold">{{home.score}}</h1>
 					</div>
 				</div>
 				<div class="my-auto mr-2 mt-1 block">
@@ -28,19 +28,108 @@
 			</div>
 
 			<div class="ml-4 rounded-lg flex bg-stone-700 px-8 py-6 my-auto text-white border-b-8 border-white">
-				<h1 class="text-5xl font-extrabold">Q{{quarter}}</h1>
+				<h1 class="text-6xl mt-1 font-extrabold">Q{{quarter}}</h1>
 				<div class="ml-5 mr-5 rounded-sm bg-white px-0.5"></div>
-				<h1 class="text-5xl font-extrabold">{{formatTimeLeft}}</h1>
-				<div class="ml-5 mr-5 rounded-sm bg-white px-0.5"></div>
-				<div class="my-auto">
-					<h1 class="text-center text-5xl font-extrabold mb-2">{{formatDown}} & {{toGo}}</h1>
-				</div>
+				<h1 class="text-6xl mt-1 font-extrabold">{{timeLeft}}</h1>
+				<!-- <div v-if="config.mode === 'football'"> -->
+					<!-- <div class="ml-5 mr-5 rounded-sm bg-white px-0.5"></div>
+					<div class="my-auto">
+						<h1 class="text-center text-6xl font-extrabold mb-2">{{formatDown()}} & {{toGo}}</h1>
+					</div> -->
+				<!-- </div> -->
 			</div>
 		</div>
 	</div>
 </template>
 
-<script setup>
+<script>
+import config from '../config.json';
+	export default {
+		data() {
+			return {
+				config,
+				home: {
+					score: "0",
+					timeouts: 3
+				},
+				guest: {
+					score: "0",
+					timeouts: 3
+				},
+				possession: "guest",
+				quarter: "1",
+				timeLeft: "750",
+				minutes: "0",
+				seconds: "0",
+				down: "1",
+				toGo: "10",
+			}
+		},
+		async mounted() {
+			if (config.enabled) {
+				while (true) {
+					await this.sleep(200);
+				// await this.subscribeToScoreboard();
+					await this.subscribeToScoreboard();
+				}
+			}
+		},
+		methods: {
+			sleep(milliseconds) {
+				return new Promise(resolve => setTimeout(resolve, milliseconds))
+			},
+			formatDown() {
+				switch (this.down) {
+					case "1":
+						return "1st";
+					case "2":
+						return "2nd";
+					case "3":
+						return "3rd";
+					case "4":
+						return "4th";
+				}
+			},
+			formatTimeLeft(minutes, seconds) {
+				// const minutes = Math.floor(timeLeft.value / 60);
+				// this.seconds = timeLeft.value % 60;
+
+				if (seconds < 10) {
+					seconds = `0${seconds}`;
+				}
+				return `${minutes}:${seconds}`;
+			},
+			async subscribeToScoreboard() {
+				const scoreboardFootball = await $fetch(config.scorbitzUrl + "football")
+				const scoreboardSoccer = await $fetch(config.scorbitzUrl + "soccer")
+				console.log(scoreboardFootball);
+				console.log(scoreboardSoccer)
+				// if (config.mode === "football") {
+				// 	this.down = scoreboardFootball.down
+				// 	this.possession = scoreboardFootball.possession
+				// 	this.home.timeouts = Number(scoreboardFootball.home_tol)
+				// 	this.guest.timeouts = Number(scoreboardFootball.guest_tol)
+				//  this.toGo = scoreboardFootball.yards_to_go
+				// } else {
+					this.home.timeouts = 0
+					this.guest.timeouts = 0
+					this.possession = "none"
+					this.toGo = 0
+				// }
+				// this.timeLeft = scoreboard.seconds
+				// this.minutes = scoreboard.minutes
+				// this.seconds = scoreboard.seconds
+				this.timeLeft = this.formatTimeLeft(scoreboardSoccer.minutes, scoreboardSoccer.seconds)
+				// TODO: Quarter
+				this.quarter = scoreboardSoccer.period
+				this.home.score = scoreboardSoccer.home_score
+				this.guest.score = scoreboardSoccer.guest_score
+			}
+		}
+	}
+</script>
+
+<!-- <script setup>
 import * as config from "../config.json";
 
 const home = reactive({
@@ -54,17 +143,19 @@ const guest = reactive({
 const possession = ref("guest")
 const quarter = ref("1")
 const timeLeft = ref("750")
+const minutes = ref("0")
+const seconds = ref("0")
 const down = ref("1")
 const toGo = ref("10")
 
 const formatTimeLeft = computed(() => {
-	const minutes = Math.floor(timeLeft.value / 60);
-	let seconds = timeLeft.value % 60;
+	// const minutes = Math.floor(timeLeft.value / 60);
+	seconds.value = timeLeft.value % 60;
 
 	if (seconds < 10) {
-		seconds = `0${seconds}`;
+		seconds.value = `0${seconds}`;
 	}
-	return `${minutes}:${seconds}`;
+	return `${minutes.value}:${seconds.value}`;
 })
 
 const formatDown = computed(() => {
@@ -86,11 +177,14 @@ const sleep = (milliseconds) => {
 
 const subscribeToScoreboard = async () => {
     const scoreboard = await $fetch(config.scorbitzUrl);
-    console.log(scoreboard);
+    console.log(scoreboard.minutes);
     down.value = scoreboard.down
     toGo.value = scoreboard.yards_to_go
     timeLeft.value = scoreboard.seconds
+	minutes.value = scoreboard.minutes
+	seconds.value = scoreboard.seconds
     // TODO: Quarter
+	quarter.value = scoreboard.period
     possession.value = scoreboard.possession
     home.score = scoreboard.home_score
     guest.score = scoreboard.guest_score
@@ -103,4 +197,4 @@ const subscribeToScoreboard = async () => {
 onMounted(async () => {
     if (config.enabled) await subscribeToScoreboard();
 })
-</script>
+</script> -->

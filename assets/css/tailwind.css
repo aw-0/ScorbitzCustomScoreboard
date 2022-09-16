@@ -1,9 +1,9 @@
 @tailwind base;
 @tailwind components;
 
-@font-face {
+/* @font-face {
 	font-family: "Goodland";
 	src: url("/fonts/Goodland.ttf") format("truetype");
-}
+} */
 
 @tailwind utilities;
