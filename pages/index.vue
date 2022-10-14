@@ -31,11 +31,11 @@
 				<h1 class="text-6xl mt-1 font-extrabold">Q{{quarter}}</h1>
 				<div class="ml-5 mr-5 rounded-sm bg-white px-0.5"></div>
 				<h1 class="text-6xl mt-1 font-extrabold">{{timeLeft}}</h1>
-				<!-- <div v-if="config.mode === 'football'"> -->
-					<!-- <div class="ml-5 mr-5 rounded-sm bg-white px-0.5"></div>
+				<!-- <div v-if="sport === 'football'"> -->
+					<div class="ml-5 mr-5 rounded-sm bg-white px-0.5" />
 					<div class="my-auto">
-						<h1 class="text-center text-6xl font-extrabold mb-2">{{formatDown()}} & {{toGo}}</h1>
-					</div> -->
+						<h1 class="text-center text-6xl font-extrabold">{{formatDown()}} & {{toGo}}</h1>
+					</div>
 				<!-- </div> -->
 			</div>
 		</div>
@@ -48,28 +48,29 @@ import config from '../config.json';
 		data() {
 			return {
 				config,
+				sport: "football",
 				home: {
-					score: "0",
+					score: 0,
 					timeouts: 3
 				},
 				guest: {
-					score: "0",
+					score: 0,
 					timeouts: 3
 				},
 				possession: "guest",
-				quarter: "1",
+				quarter: 1,
 				timeLeft: "750",
-				minutes: "0",
-				seconds: "0",
-				down: "1",
-				toGo: "10",
+				minutes: 0,
+				seconds: 0,
+				down: 1,
+				toGo: 10,
+				ballOn: 50
 			}
 		},
 		async mounted() {
 			if (config.enabled) {
 				while (true) {
 					await this.sleep(200);
-				// await this.subscribeToScoreboard();
 					await this.subscribeToScoreboard();
 				}
 			}
@@ -80,13 +81,13 @@ import config from '../config.json';
 			},
 			formatDown() {
 				switch (this.down) {
-					case "1":
+					case 1:
 						return "1st";
-					case "2":
+					case 2:
 						return "2nd";
-					case "3":
+					case 3:
 						return "3rd";
-					case "4":
+					case 4:
 						return "4th";
 				}
 			},
@@ -100,30 +101,33 @@ import config from '../config.json';
 				return `${minutes}:${seconds}`;
 			},
 			async subscribeToScoreboard() {
-				const scoreboardFootball = await $fetch(config.scorbitzUrl + "football")
-				const scoreboardSoccer = await $fetch(config.scorbitzUrl + "soccer")
-				console.log(scoreboardFootball);
-				console.log(scoreboardSoccer)
-				// if (config.mode === "football") {
-				// 	this.down = scoreboardFootball.down
-				// 	this.possession = scoreboardFootball.possession
-				// 	this.home.timeouts = Number(scoreboardFootball.home_tol)
-				// 	this.guest.timeouts = Number(scoreboardFootball.guest_tol)
-				//  this.toGo = scoreboardFootball.yards_to_go
-				// } else {
+				const scoreboard = await $fetch(config.scorbitzUrl)
+				this.sport = scoreboard.sport_name
+				if (scoreboard.sport_name === "football") {
+					this.down = scoreboard.down
+					this.possession = scoreboard.possession
+					this.home.timeouts = 0//Number(scoreboard.home_tol)
+					this.guest.timeouts = 0//Number(scoreboard.guest_tol)
+				 	this.toGo = scoreboard.yards_to_go
+					if (scoreboard.home_possession === 1) {
+						this.possession = "home"
+					} else if (scoreboard.guest_possession === 1) {
+						this.possession = "guest"
+					} else {
+						this.possession = "none"
+					}
+					this.ballOn = scoreboard.ball_on
+				} else {
 					this.home.timeouts = 0
 					this.guest.timeouts = 0
 					this.possession = "none"
 					this.toGo = 0
-				// }
-				// this.timeLeft = scoreboard.seconds
-				// this.minutes = scoreboard.minutes
-				// this.seconds = scoreboard.seconds
-				this.timeLeft = this.formatTimeLeft(scoreboardSoccer.minutes, scoreboardSoccer.seconds)
+				}
+				this.timeLeft = this.formatTimeLeft(scoreboard.minutes, scoreboard.seconds)
 				// TODO: Quarter
-				this.quarter = scoreboardSoccer.period
-				this.home.score = scoreboardSoccer.home_score
-				this.guest.score = scoreboardSoccer.guest_score
+				this.quarter = scoreboard.period
+				this.home.score = scoreboard.home_score
+				this.guest.score = scoreboard.guest_score
 			}
 		}
 	}
