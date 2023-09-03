@@ -1,9 +1,9 @@
 {	
 	"enabled": true,
-	"scorbitzUrl": "",
+	"scorbitzUrl": "http://www.scorbitz.com/venues/603/scoreboard/update",
 	"guestImgSource": "/logos/waukegan.png",
-	"guestMainHex": "#552B84",
-	"guestSecondaryHex": "#268A47",
+	"guestMainHex": "#6F3AAE",
+	"guestSecondaryHex": "#F5F5F5",
 	"guestText": "white",
 	"homeImgSource": "/logos/patriot.png",
 	"homeMainHex": "#1F5D39",

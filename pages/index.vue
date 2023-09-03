@@ -34,7 +34,7 @@
 				<!-- <div v-if="sport === 'football'"> -->
 					<div class="ml-5 mr-5 rounded-sm bg-white px-0.5" />
 					<div class="my-auto">
-						<h1 class="text-center text-6xl font-extrabold">{{formatDown()}} & {{toGo}}</h1>
+						<h1 class="mt-1 text-center text-6xl font-extrabold">{{formatDown()}} & {{toGo}}</h1>
 					</div>
 				<!-- </div> -->
 			</div>
@@ -43,12 +43,13 @@
 </template>
 
 <script>
-import config from '../config.json';
+import config from '../public/config.json';
 	export default {
 		data() {
 			return {
 				config,
 				sport: "football",
+				clockMinutes: true,
 				home: {
 					score: 0,
 					timeouts: 3
@@ -69,8 +70,14 @@ import config from '../config.json';
 		},
 		async mounted() {
 			if (config.enabled) {
+				window.addEventListener("keypress", (e) => {
+					if (e.key === "+") {
+						document.firstElementChild.style.zoom += 0.75;
+					}
+					this.clockMinutes = !this.clockMinutes
+				})
 				while (true) {
-					await this.sleep(200);
+					await this.sleep(100);
 					await this.subscribeToScoreboard();
 				}
 			}
@@ -92,13 +99,10 @@ import config from '../config.json';
 				}
 			},
 			formatTimeLeft(minutes, seconds) {
-				// const minutes = Math.floor(timeLeft.value / 60);
-				// this.seconds = timeLeft.value % 60;
-
 				if (seconds < 10) {
 					seconds = `0${seconds}`;
 				}
-				return `${minutes}:${seconds}`;
+				return `${minutes}${this.clockMinutes ? ':' : '.'}${seconds}`;
 			},
 			async subscribeToScoreboard() {
 				const scoreboard = await $fetch(config.scorbitzUrl)
